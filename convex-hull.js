@@ -1,6 +1,6 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-function Graph(id) {
+function ConvexHull(id) {
     this.id = id;            // (unique) ID of this graph
     this.vertices = [];      // set of vertices in this graph
     this.edges = [];         // set of edges in this graph
@@ -122,7 +122,7 @@ function Edge (vtx1, vtx2, id) {
 }
 
 // an object to visualize and interact with a graph
-function GraphVisualizer (graph, svg, text) {
+function ConvexHullViewer (graph, svg, text) {
     this.graph = graph;      // the graph we are visualizing
     this.svg = svg;          // the svg element we are drawing on
     this.text = text;        // a text box
@@ -454,7 +454,7 @@ function Dfs (graph, vis) {
 
 const svg = document.querySelector("#convex-hull-box");
 const text = document.querySelector("#graph-box");
-const graph = new Graph(0);
-const gv = new GraphVisualizer(graph, svg, text);
+const graph = new ConvexHull(0);
+const gv = new ConvexHullViewer(graph, svg, text);
 const dfs = new Dfs(graph, gv);
 
