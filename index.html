@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Algorithms & Visualization Project 6</title>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <script src="convex-hull.js" defer></script>
+    <!-- uncomment this line to test your program: -->
+    <!-- <script src="ch-tester.js" defer></script> -->
+  </head>
+  <body>
+    <div id="root">
+      <div class="title">
+        <h1>Algorithms & Visualization Project 6</h1>
+      </div>
+      <p class="description" id="p1">
+        This is a simple visualization of Graham's scan algorithm, which is used compute the convex hull of a set of points. The instructions required to run the algorithm are explained below:
+        <ul class="description" id="p2">
+          <li>The user can click on the blank canvas below to add as many points as desired.</li>
+          <li>Clicking "START" will begin the demo and allow the user to click "STEP" and "ANIMATE".</li>
+          <li>Clicking "STEP" illustrates a single stage of the algorithm.</li>
+          <li>Clicking "ANIMATE" illustrates each stage of the algorithm at regular time intervals until the algorithm terminates.</li>
+        </ul>
+        </p>
+      <p class="toolbar">Start</p>
+      <p class="toolbar">Step</p>
+      <p class="toolbar">Animate</p>
+      <svg id="convex-hull-box" xmlns="http://www.w3.org/2000/svg">
+      </svg>
+    </div>
+  </body>
+</html>
