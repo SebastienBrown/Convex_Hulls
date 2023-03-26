@@ -448,118 +448,78 @@ function ConvexHullViewer (graph, svg, text) {
         
 }
 
-function Dfs (graph, vis) {
-    this.graph = graph;
-    this.vis = vis;
-    this.startVertex = null;
-    this.curAnimation = null;
-    
-    this.visited = [];
-    this.active = [];
-    this.cur = null;
+function ConvexHull (ps, viewer) {
+    this.ps = ps;          // a PointSet storing the input to the algorithm
+    this.viewer = viewer;  // a ConvexHullViewer for this visualization
+
 
     this.start = function () {
-	this.startVertex = vis.highVertices.pop();
-	
-	if (this.startVertex == null) {
-	    vis.updateTextBox("Please select a starting vertex and start again.");
-	    return;
-	}
 
-	// todo: un-highlight previously highlighted stuff
-
-	this.visited = [];
-	this.active = [];
-		
-	this.cur = this.startVertex;
-	this.vis.addOverlayVertex(this.cur);
-
-	this.active.push(this.startVertex);
-	this.visited.push(this.startVertex);
-
-	
-	this.vis.muteAll();
-	this.vis.unmuteVertex(this.startVertex);
-	
-	console.log("Starting DFS from vertex " + this.startVertex.id);
 
     }
 
     this.step = function () {
 	
-	// check if execution is finished
-	if (this.active.length == 0) {
-	    return;
-	}
+    }
 
-	// find the next unvisited neighbor of this.cur
-	const next = this.nextUnvisitedNeighbor();
+    this.getConvexHull = function () {
+ 
+        let stack=[];
+
+        if(this.ps.size()==1){
+            return this.ps;
+        }
+
+        this.ps.sort();
+        stack.push(this.ps.points[0]);
+        stack.push(this.ps.points[1]);
+        console.log("INITIALLY ADDING ",this.ps.points[0]);
+        console.log("INITIALLY ADDING ",this.ps.points[1]);
+
+        for(let i=2;i<this.ps.size();i++){
+            var c=this.ps.points[i];
+            if (stack.length==1){
+                stack.push(c);
+                console.log("ADDING C TO THE STACK ",c);
+            }
+            else{
+                console.log("STACK LENGTH IS ",stack.length);
+                console.log ("ACCESSING INDICES ",stack.length-3," AND ",stack.length-2); 
+                var a = stack[stack.length-3];
+                var b = stack[stack.length-2];
+
+                var flag = 10;
+                let val = ((b.y - a.y) * (c.x - b.x)
+                - (b.x - a.x) * (c.y - b.y));
+                if (val == 0)
+                    flag=0; // collinear
+                else if (val > 0)
+                    flag=1; // clock wise (right)
+                else
+                    flag=2;; // counterclock wise (left)
+                    return "FART";
+                    console.log("THE POINTS TURN TO ",flag);
+                
+                while((flag!=1)&&(stack.length>1)){
+                    console.log("FIRST LOOP");
+                    var temp=stack.pop();
+                    console.log("POPPING ELEMENT ",temp);
+                    var a = stack[stack.length-3];
+                    var b = stack[stack.length-2];  
+                }
+                stack.push(c);
+                console.log("ADDING C TO THE STACK ",c);
+            }
+        }
+	return stack;
 	
-	if (next == null) {
-	    // if no next neighbor, cur is no longer active
-	    const prev = this.active.pop();
-	    this.vis.unhighlightVertex(prev);
-	    if (this.active.length > 0) {
-		this.cur = this.active[this.active.length - 1];
-		const edge = this.graph.getEdge(prev, this.cur);
-		this.vis.unhighlightEdge(edge);
-		this.vis.moveOverlayVertex(prev, this.cur);
-	    } else {
-		this.vis.removeOverlayVertex(this.cur);
-		this.cur = null;
-	    }
-	} else {
-	    const edge = this.graph.getEdge(this.cur, next);
-	    vis.unmuteEdge(edge);
-	    vis.highlightEdge(edge);
-	    vis.unmuteVertex(next);
-	    vis.highlightVertex(next);
-	    this.vis.moveOverlayVertex(this.cur, next);
-	    this.cur = next;
-	    this.active.push(next);
-	    this.visited.push(next);
-	}
     }
-
-    this.nextUnvisitedNeighbor = function () {
-	for (vtx of this.cur.neighbors) {
-	    if (!this.visited.includes(vtx)) {
-		return vtx;
-	    }
-	}
-	return null;
-    }
-
-    this.animate = function () {
-	if (this.curAnimation == null) {
-	    this.start();
-	    this.curAnimation = setInterval(() => {
-		this.animateStep();
-	    }, 1000);
-	}
-    }
-
-    this.animateStep = function () {
-	if (this.active.length > 0) {
-	    console.log("taking a step from vertex " + this.cur.id);
-	    this.step();
-	} else {
-	    this.stopAnimation();
-	}
-    }
-
-    this.stopAnimation = function () {
-	clearInterval(this.curAnimation);
-	this.curAnimation = null;
-	console.log("animation completed");
-    }
-
 
 }
 
-const svg = document.querySelector("#convex-hull-box");
-const text = document.querySelector("#graph-box");
-const graph = new ConvexHull(0);
-const gv = new ConvexHullViewer(graph, svg, text);
-const dfs = new Dfs(graph, gv);
+try {
+    exports.PointSet = PointSet;
+    exports.ConvexHull = ConvexHull;
+  } catch (e) {
 
+  }
