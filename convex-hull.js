@@ -492,7 +492,14 @@ function ConvexHull (ps, viewer) {
         //if the pointset is two points, return the corresponding hull
         if(this.ps.size()==2){
             stack.push(this.ps.points[0]);
-            return stack;
+
+            //initializes a new PointSet and copies the stack elements into it
+            let PS = new PointSet;
+            for(let a=0;a<stack.length;a++){
+                PS.addNewPoint(stack[a].x,stack[a].y);
+            }
+            //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
+            return PS;
         }
 
         //check whether all points in a given pointset are colinear
@@ -501,28 +508,21 @@ function ConvexHull (ps, viewer) {
         var yCheck=this.ps.points[0].y;
         var isXColinear=true;
         var isYColinear=true;
-        //console.log(this.ps.points[0].x);
-        //console.log(this.ps.points[0].y);
 
         //if any point in the pointset has a different x/coordinate from the first point, change the respective flags to false and exit the loop
         for(let z=1;z<this.ps.size();z++){
             if((this.ps.points[z].x!=xCheck)||(this.ps.points[z].y!=yCheck)){
                 //checks whether the x coordinate of a given point is different from that of the first point in pointset and updates is isXColinear accordingly
-                //console.log("THE X VALUE OF THE POINT OF INTEREST IS",this.ps.points[z].x);
-                //console.log("THE VALUE OF XCHECK IS ",xCheck);
                 if(this.ps.points[z].x!=xCheck){
                     isXColinear=false;
                 }
-                //console.log("THE Y VALUE OF THE POINT OF INTEREST IS",this.ps.points[z].y);
-                //console.log("THE VALUE OF XCHECK IS ",yCheck);
                 //checks whether the y coordinate of a given point is different from that of the first point in pointset and updates isYColinear accordingly
                 if((this.ps.points[z].y!=yCheck)){
                     isYColinear=false;
                 }
             }
         }
-        //console.log("STATUS OF ISXCOLINEAR ",isXColinear);
-        //console.log("STATUS OF ISYCOLINEAR ",isYColinear);
+
         //initializes a new array for storing convex hull of colinear points
         //if the x or y coordinate of all points in pointset are the same, creates the corresponding convex hull using the first point and furthest point
         let stackC=[];
@@ -530,7 +530,14 @@ function ConvexHull (ps, viewer) {
             stackC.push(this.ps.points[0]);
             stackC.push(this.ps.points[this.ps.size()-1]);
             stackC.push(this.ps.points[0]);
-            return stackC;
+
+            //initializes a new PointSet and copies the stack elements into it
+            let PS = new PointSet;
+            for(let a=0;a<stackC.length;a++){
+                PS.addNewPoint(stackC[a].x,stackC[a].y);
+            }
+            //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
+            return PS;
         } 
         
         //completes the upper section of the convex hull
@@ -587,8 +594,13 @@ function ConvexHull (ps, viewer) {
                 stack.push(c);
             }
         }
+        //initializes a new PointSet and copies the stack elements into it
+        let PS = new PointSet;
+        for(let a=0;a<stack.length;a++){
+            PS.addNewPoint(stack[a].x,stack[a].y);
+        }
         //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
-        return stack;
+        return PS;
     }
 }
 //code for running the tester
