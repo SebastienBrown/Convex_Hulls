@@ -125,15 +125,18 @@ function ConvexHullViewer (svg, ps) {
     // define the behavior for clicking on the svg element
     this.svg.addEventListener("click", (e) => {
     // create a new vertex
-    const rect = this.svg.getBoundingClientRect();
-	const x = e.clientX - rect.left;
-	const y = e.clientY - rect.top;
-    var i = 0;
-    const elt = document.createElementNS(SVG_NS, "circle");
-	elt.classList.add("vertex");
-	elt.setAttributeNS(null, "cx", x);
-	elt.setAttributeNS(null, "cy", y);
-    svg.appendChild(elt);
+
+        const rect = this.svg.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        var i = 0;
+        const elt = document.createElementNS(SVG_NS, "circle");
+        elt.classList.add("vertex");
+        elt.setAttributeNS(null, "cx", x);
+        elt.setAttributeNS(null, "cy", y);
+        svg.appendChild(elt);
+    
+
     });
     
 
@@ -353,9 +356,6 @@ try {
   } catch (e) {
     console.log("not running in Node");
   }
-
-  const gv = new ConvexHullViewer(svg, ps);
-  const ch = new ConvexHull(ps, gv); 
 
 function draw() {
     const svg = document.querySelector("#convex-hull-box");
