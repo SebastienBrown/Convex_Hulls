@@ -450,16 +450,13 @@ function ConvexHullViewer (graph, svg, text) {
         
 }
 
-
+//determines whether the angle abc represents a right turn or not
+//is used to determine which elements should belong to the convex hull of the pointset
 function orientation(a,b,c){
-    let val = ((b.y - a.y) * (c.x - b.x)
-                - (b.x - a.x) * (c.y - b.y));
-                if (val == 0){ 
-                    return 0;}  //colinear
-                else if (val > 0){
-                    return 1;}// clock wise (right)
-                else{
-                    return 2;// counterclock wise (left)
+    let crossProduct = ((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)); //calculates the cross product of ab and bc to determine the value of the angle abc
+                if (crossProduct == 0){return 0;}  //the points a,b,c are colinear, so this is not a right turn
+                else if (crossProduct > 0){return 1;}//the angle abc denotes a right turn, so c can be added to the convex hull
+                else{return 2;//the angle abc denotes a left turn, so this is not a right turn
                 }
 }
 
@@ -467,7 +464,7 @@ function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
 
-
+    
     this.start = function () {
 
 
@@ -478,69 +475,126 @@ function ConvexHull (ps, viewer) {
     }
 
     this.getConvexHull = function () {
- 
+        
+        //initialize array for saving convex hull points
         let stack=[];
 
+        //if the pointset is a single point, return that same point as the hull
         if(this.ps.size()==1){
             return this.ps;
         }
 
+        //sort the pointset and push the 2 elements with the lowest x-coordinate on the stack
         this.ps.sort();
         stack.push(this.ps.points[0]);
         stack.push(this.ps.points[1]);
 
+        //if the pointset is two points, return the corresponding hull
         if(this.ps.size()==2){
             stack.push(this.ps.points[0]);
             return stack;
         }
 
+        //check whether all points in a given pointset are colinear
+        //saves x,y coordinates of first point in pointset and initializes two boolean flags
+        var xCheck=this.ps.points[0].x;
+        var yCheck=this.ps.points[0].y;
+        var isXColinear=true;
+        var isYColinear=true;
+        //console.log(this.ps.points[0].x);
+        //console.log(this.ps.points[0].y);
+
+        //if any point in the pointset has a different x/coordinate from the first point, change the respective flags to false and exit the loop
+        for(let z=1;z<this.ps.size();z++){
+            if((this.ps.points[z].x!=xCheck)||(this.ps.points[z].y!=yCheck)){
+                //checks whether the x coordinate of a given point is different from that of the first point in pointset and updates is isXColinear accordingly
+                //console.log("THE X VALUE OF THE POINT OF INTEREST IS",this.ps.points[z].x);
+                //console.log("THE VALUE OF XCHECK IS ",xCheck);
+                if(this.ps.points[z].x!=xCheck){
+                    isXColinear=false;
+                }
+                //console.log("THE Y VALUE OF THE POINT OF INTEREST IS",this.ps.points[z].y);
+                //console.log("THE VALUE OF XCHECK IS ",yCheck);
+                //checks whether the y coordinate of a given point is different from that of the first point in pointset and updates isYColinear accordingly
+                if((this.ps.points[z].y!=yCheck)){
+                    isYColinear=false;
+                }
+            }
+        }
+        //console.log("STATUS OF ISXCOLINEAR ",isXColinear);
+        //console.log("STATUS OF ISYCOLINEAR ",isYColinear);
+        //initializes a new array for storing convex hull of colinear points
+        //if the x or y coordinate of all points in pointset are the same, creates the corresponding convex hull using the first point and furthest point
+        let stackC=[];
+        if(isXColinear==true || isYColinear==true){
+            stackC.push(this.ps.points[0]);
+            stackC.push(this.ps.points[this.ps.size()-1]);
+            stackC.push(this.ps.points[0]);
+            return stackC;
+        } 
+        
+        //completes the upper section of the convex hull
         for(let i=2;i<this.ps.size();i++){
             var c=this.ps.points[i];
+            
+            //if the stack has length 1, push the next element of this.ps onto it
             if (stack.length==1){
                 stack.push(c);
             }
             else{
+                //defines variables a and b as the top 2 elements of the stack
                 var a = stack[stack.length-2];
                 var b = stack[stack.length-1];
                 
+                //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
                 while((stack.length>1)&&(orientation(a,b,c)!=1)){
                     stack.pop();
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1];
                 }
+                //push c onto the stack
                 stack.push(c);
             }
         }
 
+        //this section of the code creates the lower portion of the convex hull
+        //reverses the ordering of pointset so that it is sorted by descending x coordinate
         this.ps.reverse();
-        stack.push(this.ps.points[0]);
+
+        //pushes the second element of pointset onto the stack
         stack.push(this.ps.points[1]);
 
+        //completes the lower section of the convex hull
         for(let i=2;i<this.ps.size();i++){
             var c=this.ps.points[i];
+
+            //if the stack has length 1, push the next element of this.ps onto it
             if (stack.length==1){
                 stack.push(c);
             }
             else{
+                //defines variables a and b as the top 2 elements of the stack
                 var a = stack[stack.length-2];
                 var b = stack[stack.length-1];
                 
-                while((orientation(a,b,c)!=1)&&(stack.length>1)){
+                //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
+                while((stack.length>1)&&(orientation(a,b,c)!=1)){
                     stack.pop();
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1]; 
                 }
+                //push c onto the stack
                 stack.push(c);
             }
         }
+        //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
         return stack;
     }
 }
-
-
+//code for running the tester
 try {
     exports.PointSet = PointSet;
     exports.ConvexHull = ConvexHull;
   } catch (e) {
-
+    console.log("not running in Node");
   }
