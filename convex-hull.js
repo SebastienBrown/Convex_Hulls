@@ -35,6 +35,7 @@ function Point (x, y, id) {
     }
 }
 
+
 // An object that represents a set of Points in the plane. The `sort`
 // function sorts the points according to the `Point.compareTo`
 // function. The `reverse` function reverses the order of the
@@ -224,6 +225,7 @@ function Edge (vtx1, vtx2, id) {
     this.equals = function (vtx1, vtx2) {
 	return (this.vtx1 == vtx1 && this.vtx2 == vtx2) || (this.vtx1 == vtx2 && this.vtx2 == vtx1);
     }
+
 }
 
 // an object to visualize and interact with a graph
@@ -448,6 +450,19 @@ function ConvexHullViewer (graph, svg, text) {
         
 }
 
+
+function orientation(a,b,c){
+    let val = ((b.y - a.y) * (c.x - b.x)
+                - (b.x - a.x) * (c.y - b.y));
+                if (val == 0){ 
+                    return 0;}  //colinear
+                else if (val > 0){
+                    return 1;}// clock wise (right)
+                else{
+                    return 2;// counterclock wise (left)
+                }
+}
+
 function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
@@ -473,49 +488,55 @@ function ConvexHull (ps, viewer) {
         this.ps.sort();
         stack.push(this.ps.points[0]);
         stack.push(this.ps.points[1]);
-        console.log("INITIALLY ADDING ",this.ps.points[0]);
-        console.log("INITIALLY ADDING ",this.ps.points[1]);
+
+        if(this.ps.size()==2){
+            stack.push(this.ps.points[0]);
+            return stack;
+        }
 
         for(let i=2;i<this.ps.size();i++){
             var c=this.ps.points[i];
             if (stack.length==1){
                 stack.push(c);
-                console.log("ADDING C TO THE STACK ",c);
             }
             else{
-                console.log("STACK LENGTH IS ",stack.length);
-                console.log ("ACCESSING INDICES ",stack.length-3," AND ",stack.length-2); 
-                var a = stack[stack.length-3];
-                var b = stack[stack.length-2];
-
-                var flag = 10;
-                let val = ((b.y - a.y) * (c.x - b.x)
-                - (b.x - a.x) * (c.y - b.y));
-                if (val == 0)
-                    flag=0; // collinear
-                else if (val > 0)
-                    flag=1; // clock wise (right)
-                else
-                    flag=2;; // counterclock wise (left)
-                    return "FART";
-                    console.log("THE POINTS TURN TO ",flag);
+                var a = stack[stack.length-2];
+                var b = stack[stack.length-1];
                 
-                while((flag!=1)&&(stack.length>1)){
-                    console.log("FIRST LOOP");
-                    var temp=stack.pop();
-                    console.log("POPPING ELEMENT ",temp);
-                    var a = stack[stack.length-3];
-                    var b = stack[stack.length-2];  
+                while((stack.length>1)&&(orientation(a,b,c)!=1)){
+                    stack.pop();
+                    var a = stack[stack.length-2];
+                    var b = stack[stack.length-1];
                 }
                 stack.push(c);
-                console.log("ADDING C TO THE STACK ",c);
             }
         }
-	return stack;
-	
-    }
 
+        this.ps.reverse();
+        stack.push(this.ps.points[0]);
+        stack.push(this.ps.points[1]);
+
+        for(let i=2;i<this.ps.size();i++){
+            var c=this.ps.points[i];
+            if (stack.length==1){
+                stack.push(c);
+            }
+            else{
+                var a = stack[stack.length-2];
+                var b = stack[stack.length-1];
+                
+                while((orientation(a,b,c)!=1)&&(stack.length>1)){
+                    stack.pop();
+                    var a = stack[stack.length-2];
+                    var b = stack[stack.length-1]; 
+                }
+                stack.push(c);
+            }
+        }
+        return stack;
+    }
 }
+
 
 try {
     exports.PointSet = PointSet;
