@@ -118,9 +118,9 @@ function orientation(a,b,c){
 }
 
 function ConvexHullViewer (svg, ps) {
-    this.svg = svg;  // a n svg object where the visualization is drawn
+    this.svg = svg;  // an svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
-    this.id = 0;
+    this.pointCount = 0;
 
     // define the behavior for clicking on the svg element
     this.svg.addEventListener("click", (e) => {
@@ -129,13 +129,13 @@ function ConvexHullViewer (svg, ps) {
         const rect = this.svg.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        var i = 0;
         const elt = document.createElementNS(SVG_NS, "circle");
         elt.classList.add("vertex");
         elt.setAttributeNS(null, "cx", x);
         elt.setAttributeNS(null, "cy", y);
         svg.appendChild(elt);
-    
+        ps.addPoint(new Point(x, y, this.pointCount));
+        this.pointCount++;
 
     });
     
@@ -146,7 +146,6 @@ function ConvexHullViewer (svg, ps) {
 function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
-    this.startVertex = null;
     this.curAnimation = null;
     
     this.visited = [];
@@ -154,29 +153,16 @@ function ConvexHull (ps, viewer) {
     this.cur = null;
     
     this.start = function () {
-        this.startVertex = viewer.highVertices.pop();
-	
-        if (this.startVertex == null) {
-            viewer.updateTextBox("Please select a starting vertex and start again.");
-            return;
-        }
     
         // todo: un-highlight previously highlighted stuff
-    
-        this.visited = [];
-        this.active = [];
-            
-        this.cur = this.startVertex;
-        this.vis.addOverlayVertex(this.cur);
-    
-        this.active.push(this.startVertex);
-        this.visited.push(this.startVertex);
-    
-        
-        this.vis.muteAll();
-        this.vis.unmuteVertex(this.startVertex);
-        
-        console.log("Starting from vertex " + this.startVertex.id);
+        this.ps.sort();
+        const edgeElt = document.createElementNS(SVG_NS, "line");
+        edgeElt.setAttributeNS(null, "x1", ps.points[0].x);
+	    edgeElt.setAttributeNS(null, "y1", ps.points[0].y);
+	    edgeElt.setAttributeNS(null, "x2", ps.points[1].x);
+	    edgeElt.setAttributeNS(null, "y2", ps.points[1].yy);
+	    edgeElt.classList.add("edge");
+        svg.appendChild(edgeElt);
 
     }
 
@@ -359,7 +345,7 @@ try {
 
 function draw() {
     const svg = document.querySelector("#convex-hull-box");
-    let ps = [];
+    let ps = new PointSet;
     const gv = new ConvexHullViewer(svg, ps);
     const ch = new ConvexHull(ps, gv); 
 }
