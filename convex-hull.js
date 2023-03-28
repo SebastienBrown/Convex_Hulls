@@ -153,6 +153,7 @@ function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
     this.curAnimation = null;
+    this.stepCount = 0;
     
      //initialize array that stores step instructions.  
     var steps=[];
@@ -160,7 +161,6 @@ function ConvexHull (ps, viewer) {
     this.start = function () {
     
         // todo: un-highlight previously highlighted stuff
-
         while(viewer.edgesCount >= 1){
             (viewer.edges.pop()).classList.remove("edge");
             viewer.edgesCount--;
@@ -171,14 +171,51 @@ function ConvexHull (ps, viewer) {
 
     this.step = function () {
 	
+        //getConvexHull needs to be calculated before this.
         if(steps.length < 1){
             this.getConvexHull();
         }
-        //implement this next.
+        //stepCount already finished steps edge case
+        if(this.stepCount >= steps.length){
+            return;
+        }
+        //one point edge case
         if(this.ps.size()==1){
             return;
         }
 
+        //makes first edge
+        if(this.stepCount == 0){
+        var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        edgeElt.setAttributeNS(null, "x1", ps.points[0].x);
+	    edgeElt.setAttributeNS(null, "y1", ps.points[0].y);
+	    edgeElt.setAttributeNS(null, "x2", ps.points[1].x);
+	    edgeElt.setAttributeNS(null, "y2", ps.points[1].y);
+	    edgeElt.classList.add("edge");
+        viewer.edges.push(edgeElt);
+        svg.appendChild(edgeElt);
+        viewer.edgesCount++;
+        }
+        
+        //places edges in steps in, deciding to remove if it's a duplicate step or adding the edge otherwise.
+            if((steps[this.stepCount].x == steps[this.stepCount-1].x) && (steps[this.stepCount].y == steps[this.stepCount-1].y)){
+                (viewer.edges.pop()).classList.remove("edge");
+                viewer.edgesCount--;
+            }else{
+            var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            edgeElt.setAttributeNS(null, "x1", ps.points[this.stepCount-1].x);
+	        edgeElt.setAttributeNS(null, "y1", ps.points[this.stepCount-1].y);
+	        edgeElt.setAttributeNS(null, "x2", ps.points[this.stepCount].x);
+	        edgeElt.setAttributeNS(null, "y2", ps.points[this.stepCount].y);
+	        edgeElt.classList.add("edge");
+            viewer.edges.push(edgeElt);
+            svg.appendChild(edgeElt);
+            viewer.edgesCount++;
+            }
+
+
+        //move to next step.
+        this.stepCount++;
     }
 
     this.animate = function () {
