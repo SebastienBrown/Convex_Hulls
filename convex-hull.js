@@ -276,29 +276,30 @@ function ConvexHull (ps, viewer) {
 
         //check whether all points in a given pointset are colinear
         //saves x,y coordinates of first point in pointset and initializes two boolean flags
-        var xCheck=this.ps.points[0].x;
-        var yCheck=this.ps.points[0].y;
-        var isXColinear=true;
-        var isYColinear=true;
+        var x0=this.ps.points[0].x;
+        var y0=this.ps.points[0].y;
+        var x1=this.ps.points[1].x;
+        var y1=this.ps.points[1].y;
+        var isColinear=true;
+        var slopeRef = (y1-y0)/(x1-x0);
 
         //if any point in the pointset has a different x/coordinate from the first point, change the respective flags to false and exit the loop
-        for(let z=1;z<this.ps.size();z++){
-            if((this.ps.points[z].x!=xCheck)||(this.ps.points[z].y!=yCheck)){
-                //checks whether the x coordinate of a given point is different from that of the first point in pointset and updates is isXColinear accordingly
-                if(this.ps.points[z].x!=xCheck){
-                    isXColinear=false;
-                }
-                //checks whether the y coordinate of a given point is different from that of the first point in pointset and updates isYColinear accordingly
-                if((this.ps.points[z].y!=yCheck)){
-                    isYColinear=false;
-                }
+        for(let z=2;z<this.ps.size();z++){
+            //calculates the slope between the first point and the point at index z
+            xR=this.ps.points[z].x;
+            yR=this.ps.points[z].y;
+            slope=(yR-y0)/(xR-x0);
+
+            //modifies the colinearity flag accordingly
+            if(slope!=slopeRef){
+                isColinear=false;
             }
         }
 
         //initializes a new array for storing convex hull of colinear points
         //if the x or y coordinate of all points in pointset are the same, creates the corresponding convex hull using the first point and furthest point
         let stackC=[];
-        if(isXColinear==true || isYColinear==true){
+        if(isColinear==true){
             stackC.push(this.ps.points[0]);
             stackC.push(this.ps.points[this.ps.size()-1]);
             stackC.push(this.ps.points[0]);
