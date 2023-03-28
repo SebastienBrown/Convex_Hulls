@@ -393,6 +393,7 @@ function ConvexHull (ps, viewer) {
         for(let a=0;a<stack.length;a++){
             PS.addNewPoint(stack[a].x,stack[a].y);
         }
+        this.ps.reverse();
         //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
         return PS;
     }
