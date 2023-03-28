@@ -121,18 +121,24 @@ function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // an svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
     this.pointCount = 0;
-
+    this.edgesCount = 0;
+    this.vertices = [];
+    this.edges = [];
     // define the behavior for clicking on the svg element
     this.svg.addEventListener("click", (e) => {
     // create a new vertex
+    /*    if(this.pointCount >= 1){
+            (this.vertices.pop()).classList.remove("vertex");
+        } */
 
         const rect = this.svg.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const elt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        var elt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         elt.classList.add("vertex");
         elt.setAttributeNS(null, "cx", x);
         elt.setAttributeNS(null, "cy", y);
+        this.vertices.push(elt);
         svg.appendChild(elt);
         ps.addPoint(new Point(x, y, this.pointCount));
         this.pointCount++;
@@ -144,7 +150,7 @@ function ConvexHullViewer (svg, ps) {
 }
 
 function ConvexHull (ps, viewer) {
-    this.ps = ps;          // a PointSet storing the input to the algorithm
+    this.ps = ps.sort();          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
     this.curAnimation = null;
     
@@ -155,14 +161,21 @@ function ConvexHull (ps, viewer) {
     this.start = function () {
     
         // todo: un-highlight previously highlighted stuff
-        this.ps.sort();
-        const edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
+
+        if(viewer.edgesCount >= 1){
+            (viewer.edges.pop()).classList.remove("edge");
+        }else{
+        
+        var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
         edgeElt.setAttributeNS(null, "x1", ps.points[0].x);
 	    edgeElt.setAttributeNS(null, "y1", ps.points[0].y);
 	    edgeElt.setAttributeNS(null, "x2", ps.points[1].x);
 	    edgeElt.setAttributeNS(null, "y2", ps.points[1].y);
 	    edgeElt.classList.add("edge");
+        viewer.edges.push(edgeElt);
         svg.appendChild(edgeElt);
+        viewer.edgesCount++;
+        }
 
     }
 
