@@ -1,4 +1,4 @@
-const SVG_NS = "http://www.w3.org/2000/svg";
+//const SVG_NS = "http://www.w3.org/2000/svg";
 
 //analogous to the Vertex function
 function Point (x, y, id) {
@@ -129,7 +129,7 @@ function ConvexHullViewer (svg, ps) {
         const rect = this.svg.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const elt = document.createElementNS(SVG_NS, "circle");
+        const elt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         elt.classList.add("vertex");
         elt.setAttributeNS(null, "cx", x);
         elt.setAttributeNS(null, "cy", y);
@@ -156,11 +156,11 @@ function ConvexHull (ps, viewer) {
     
         // todo: un-highlight previously highlighted stuff
         this.ps.sort();
-        const edgeElt = document.createElementNS(SVG_NS, "line");
+        const edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
         edgeElt.setAttributeNS(null, "x1", ps.points[0].x);
 	    edgeElt.setAttributeNS(null, "y1", ps.points[0].y);
 	    edgeElt.setAttributeNS(null, "x2", ps.points[1].x);
-	    edgeElt.setAttributeNS(null, "y2", ps.points[1].yy);
+	    edgeElt.setAttributeNS(null, "y2", ps.points[1].y);
 	    edgeElt.classList.add("edge");
         svg.appendChild(edgeElt);
 
@@ -343,9 +343,14 @@ try {
     console.log("not running in Node");
   }
 
-function draw() {
-    const svg = document.querySelector("#convex-hull-box");
-    let ps = new PointSet;
-    const gv = new ConvexHullViewer(svg, ps);
-    const ch = new ConvexHull(ps, gv); 
-}
+  var svg = null;
+  var ps = null;
+  var gv = null;
+  var ch = null;
+
+  function draw(){
+    svg = document.querySelector("#convex-hull-box");;
+    ps = new PointSet;
+    gv = new ConvexHullViewer(svg, ps);
+    ch = new ConvexHull(ps, gv); 
+  }
