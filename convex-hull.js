@@ -171,6 +171,12 @@ function ConvexHull (ps, viewer) {
 
     this.step = function () {
 	
+        //implement this next.
+
+    }
+
+    this.animate = function () {
+	
         //makes an edge between two leftmost points, and erases it otherwise.
         if(viewer.edgesCount >= 1){
             (viewer.edges.pop()).classList.remove("edge");
