@@ -162,8 +162,19 @@ function ConvexHull (ps, viewer) {
     
         // todo: un-highlight previously highlighted stuff
 
+        while(viewer.edgesCount >= 1){
+            (viewer.edges.pop()).classList.remove("edge");
+            viewer.edgesCount--;
+        }
+
+    }
+
+    this.step = function () {
+	
+        //makes an edge between two leftmost points, and erases it otherwise.
         if(viewer.edgesCount >= 1){
             (viewer.edges.pop()).classList.remove("edge");
+            viewer.edgesCount--;
         }else{
         
         var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -176,45 +187,6 @@ function ConvexHull (ps, viewer) {
         svg.appendChild(edgeElt);
         viewer.edgesCount++;
         }
-
-    }
-
-    this.step = function () {
-	
-	// check if execution is finished
-	if (this.active.length == 0) {
-	    return;
-	}
-
-	// find the next unvisited neighbor of this.cur
-	const next = this.nextUnvisitedNeighbor();
-	
-
-	if (next == null) {
-	    // if no next neighbor, cur is no longer active
-	    const prev = this.active.pop();
-	    this.viewer.unhighlightVertex(prev);
-	    if (this.active.length > 0) {
-		this.cur = this.active[this.active.length - 1];
-		const edge = this.ps.getEdge(prev, this.cur);
-		this.viewer.unhighlightEdge(edge);
-		this.viewer.moveOverlayVertex(prev, this.cur);
-	    } else {
-		this.viewer.removeOverlayVertex(this.cur);
-		this.cur = null;
-	    }
-	} else {
-	    const edge = this.ps.getEdge(this.cur, next);
-	    viewer.unmuteEdge(edge);
-	    viewer.highlightEdge(edge);
-	    viewer.unmuteVertex(next);
-	    viewer.highlightVertex(next);
-	    this.viewer.moveOverlayVertex(this.cur, next);
-	    this.cur = next;
-	    this.active.push(next);
-	    this.visited.push(next);
-	}
-
 
     }
 
