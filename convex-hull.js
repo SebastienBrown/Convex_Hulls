@@ -150,7 +150,7 @@ function ConvexHullViewer (svg, ps) {
 }
 
 function ConvexHull (ps, viewer) {
-    this.ps = ps.sort();          // a PointSet storing the input to the algorithm
+    this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
     this.curAnimation = null;
     
@@ -329,6 +329,8 @@ function ConvexHull (ps, viewer) {
             //if the stack has length 1, push the next element of this.ps onto it
             if (stack.length==1){
                 stack.push(c);
+
+                steps.push(c);
             }
             else{
                 //defines variables a and b as the top 2 elements of the stack
@@ -337,12 +339,16 @@ function ConvexHull (ps, viewer) {
                 
                 //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
                 while((stack.length>1)&&(orientation(a,b,c)!=1)){
-                    stack.pop();
+                    steps.push(stack.pop());
+                    //adds the popped stack element to steps 
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1]; 
                 }
                 //push c onto the stack
                 stack.push(c);
+
+                //adds to steps
+                steps.push(c);
             }
         }
         //initializes a new PointSet and copies the stack elements into it
@@ -364,13 +370,13 @@ try {
   }
 
   var svg = null;
-  var ps = null;
   var gv = null;
+  //var ps = null;
   var ch = null;
 
   function draw(){
     svg = document.querySelector("#convex-hull-box");;
-    ps = new PointSet;
+    var ps = new PointSet;
     gv = new ConvexHullViewer(svg, ps);
     ch = new ConvexHull(ps, gv); 
   }
