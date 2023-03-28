@@ -154,9 +154,8 @@ function ConvexHull (ps, viewer) {
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
     this.curAnimation = null;
     
-    this.visited = [];
-    this.active = [];
-    this.cur = null;
+     //initialize array that stores step instructions.  
+    var steps=[];
     
     this.start = function () {
     
@@ -166,12 +165,19 @@ function ConvexHull (ps, viewer) {
             (viewer.edges.pop()).classList.remove("edge");
             viewer.edgesCount--;
         }
+        steps = [];
 
     }
 
     this.step = function () {
 	
+        if(steps.length < 1){
+            this.getConvexHull();
+        }
         //implement this next.
+        if(this.ps.size()==1){
+            return;
+        }
 
     }
 
@@ -198,7 +204,7 @@ function ConvexHull (ps, viewer) {
 
     this.getConvexHull = function () {
         
-        //initialize array for saving convex hull points
+        //array for saving convex hull points
         let stack=[];
 
         //if the pointset is a single point, return that same point as the hull
@@ -211,9 +217,16 @@ function ConvexHull (ps, viewer) {
         stack.push(this.ps.points[0]);
         stack.push(this.ps.points[1]);
 
+        //adds to steps instructions
+        steps.push(this.ps.points[0]);
+        steps.push(this.ps.points[1]);
+
         //if the pointset is two points, return the corresponding hull
         if(this.ps.size()==2){
             stack.push(this.ps.points[0]);
+
+            //adds to steps instructions
+            steps.push(this.ps.points[0]);
 
             //initializes a new PointSet and copies the stack elements into it
             let PS = new PointSet;
@@ -253,6 +266,12 @@ function ConvexHull (ps, viewer) {
             stackC.push(this.ps.points[this.ps.size()-1]);
             stackC.push(this.ps.points[0]);
 
+            //adding to steps
+            steps = [];
+            steps.push(this.ps.points[0]);
+            steps.push(this.ps.points[this.ps.size()-1]);
+            steps.push(this.ps.points[0]);
+
             //initializes a new PointSet and copies the stack elements into it
             let PS = new PointSet;
             for(let a=0;a<stackC.length;a++){
@@ -269,6 +288,9 @@ function ConvexHull (ps, viewer) {
             //if the stack has length 1, push the next element of this.ps onto it
             if (stack.length==1){
                 stack.push(c);
+
+                //adding to steps
+                steps.push(c);
             }
             else{
                 //defines variables a and b as the top 2 elements of the stack
@@ -277,12 +299,16 @@ function ConvexHull (ps, viewer) {
                 
                 //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
                 while((stack.length>1)&&(orientation(a,b,c)!=1)){
-                    stack.pop();
+                    steps.push(stack.pop());
+                    //if a vertex in steps is already defined, it will be deleted in step().
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1];
                 }
                 //push c onto the stack
                 stack.push(c);
+                
+                //add c to steps
+                steps.push(c);
             }
         }
 
@@ -292,6 +318,9 @@ function ConvexHull (ps, viewer) {
 
         //pushes the second element of pointset onto the stack
         stack.push(this.ps.points[1]);
+
+        //adds to steps
+        steps.push(this.ps.points[1]);
 
         //completes the lower section of the convex hull
         for(let i=2;i<this.ps.size();i++){
