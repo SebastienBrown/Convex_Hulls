@@ -21,9 +21,11 @@
         </ul>
         </p>
       <svg id="convex-hull-box" xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+         <!-- the svg which will be drawn into -->
 	<rect width="100%" height="100%" fill="gray"/>
       </svg>
       <button onclick="ch.start()">Start</button> <button onclick="ch.step()">Step</button> <button onclick="ch.animate()">Animate</button>
+       <!-- Buttons that each call a diff javascript method -->
       <p>Messages:</p>
       <p id="graph-box"></p>
     </div>
@@ -34,6 +36,7 @@
     <script>
       window.onload = () => {
 	  draw();
+    //exists so that the tester doesn't get upset at the document references.
       }
     </script>   
 
