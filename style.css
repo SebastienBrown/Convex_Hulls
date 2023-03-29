@@ -41,6 +41,7 @@ svg{
   margin:0px;
   background-color:white;
   height:400px;
+  margin: auto;
   position: relative;
   display: block;
 }
