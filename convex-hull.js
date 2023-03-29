@@ -195,7 +195,7 @@ function ConvexHull (ps, viewer) {
                 this.viewer.edgesCount--;
                 this.steps.splice(this.stepCount-1,1);
                 this.steps.splice(this.stepCount-1,1);
-                console.log(this.steps);
+                //console.log(this.steps);
                 this.stepCount--;
                 this.stepCount--;
             }else{
