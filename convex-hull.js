@@ -140,6 +140,7 @@ function ConvexHullViewer (svg, ps) {
         //adds in the point and adds the styling
         elt.setAttributeNS(null, "cx", x);
         elt.setAttributeNS(null, "cy", y);
+        elt.setAttributeNS(null, "r", 10);
         //sets its location right
         this.vertices.push(elt);
         svg.appendChild(elt);
