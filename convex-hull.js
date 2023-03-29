@@ -140,7 +140,7 @@ function ConvexHullViewer (svg, ps) {
         elt.setAttributeNS(null, "cy", y);
         this.vertices.push(elt);
         svg.appendChild(elt);
-        ps.addPoint(new Point(x, y, this.pointCount));
+        ps.addPoint(new Point(x, 400-y, this.pointCount));
         this.pointCount++;
 
     });
@@ -157,6 +157,7 @@ function ConvexHull (ps, viewer) {
     
      //initialize array that stores step instructions.  
     var steps=[];
+    this.steps=steps;
     var popList = new Set();
     
     this.start = function () {
@@ -166,8 +167,10 @@ function ConvexHull (ps, viewer) {
             (viewer.edges.pop()).classList.remove("edge");
             viewer.edgesCount--;
         }
-        steps = [];
-        this.stepCount = 0;
+        while(this.steps.length >= 1){
+            this.steps.pop();
+        }
+        this.stepCount = 1;
 
     }
 
@@ -185,28 +188,33 @@ function ConvexHull (ps, viewer) {
         if(this.ps.size()==1){
             return;
         }
-        
+        //console.log(this.steps);
         //places edges in steps in, deciding to remove if it's a duplicate step or adding the edge otherwise.
             if((this.steps[this.stepCount].x == this.steps[this.stepCount-1].x) && (this.steps[this.stepCount].y == this.steps[this.stepCount-1].y)){
                 (this.viewer.edges.pop()).classList.remove("edge");
                 this.viewer.edgesCount--;
+                this.steps.splice(this.stepCount-1,1);
+                this.steps.splice(this.stepCount-1,1);
+                console.log(this.steps);
                 this.stepCount--;
                 this.stepCount--;
             }else{
             var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
             edgeElt.setAttributeNS(null, "x1", steps[this.stepCount-1].x);
-	        edgeElt.setAttributeNS(null, "y1", steps[this.stepCount-1].y);
+	        edgeElt.setAttributeNS(null, "y1", 400-steps[this.stepCount-1].y);
 	        edgeElt.setAttributeNS(null, "x2", steps[this.stepCount].x);
-	        edgeElt.setAttributeNS(null, "y2", steps[this.stepCount].y);
+	        edgeElt.setAttributeNS(null, "y2", 400-steps[this.stepCount].y);
 	        edgeElt.classList.add("edge");
             this.viewer.edges.push(edgeElt);
             svg.appendChild(edgeElt);
             this.viewer.edgesCount++;
             }
 
-        console.log(steps);
+        //console.log(this.steps);
+        console.log(this.stepCount);
         //move to next step.
         this.stepCount++;
+        //this.steps=this.steps.reverse();
     }
 
     this.animate = function () {
@@ -242,12 +250,16 @@ function ConvexHull (ps, viewer) {
 
         //sort the pointset and push the 2 elements with the lowest x-coordinate on the stack
         this.ps.sort();
+        //this.ps.reverse();
         stack.push(this.ps.points[0]);
         stack.push(this.ps.points[1]);
 
         //adds to steps instructions
         steps.push(this.ps.points[0]);
         steps.push(this.ps.points[1]);
+        console.log("Initial push to steps ",this.ps.points[0]);
+        console.log("Initial push to steps ",this.ps.points[1]);
+        
 
         //if the pointset is two points, return the corresponding hull
         if(this.ps.size()==2){
@@ -255,6 +267,7 @@ function ConvexHull (ps, viewer) {
 
             //adds to steps instructions
             steps.push(this.ps.points[0]);
+            console.log(this.steps);
 
             //initializes a new PointSet and copies the stack elements into it
             let PS = new PointSet;
@@ -320,6 +333,9 @@ function ConvexHull (ps, viewer) {
 
                 //adding to steps
                 steps.push(c);
+                console.log("push to steps at start of 1st for loop ",c);
+
+                //console.log(this.steps);
             }
             else{
                 //defines variables a and b as the top 2 elements of the stack
@@ -328,7 +344,9 @@ function ConvexHull (ps, viewer) {
                 
                 //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
                 while((stack.length>1)&&(orientation(a,b,c)!=1)){
-                    steps.push(stack.pop());
+                    var remove = stack.pop();
+                    steps.push(remove);
+                    console.log("push to steps when poppin from array ",remove);
                     //if a vertex in steps is already defined, it will be deleted in step().
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1];
@@ -338,6 +356,8 @@ function ConvexHull (ps, viewer) {
                 
                 //add c to steps
                 steps.push(c);
+                console.log("pushing c at end of loop iteration ",c);
+                //console.log(this.steps);
             }
         }
 
@@ -347,9 +367,11 @@ function ConvexHull (ps, viewer) {
 
         //pushes the second element of pointset onto the stack
         stack.push(this.ps.points[1]);
+        //console.log(this.ps.points[1]);
 
         //adds to steps
         steps.push(this.ps.points[1]);
+        console.log("pushing initial point before 2nd loop ",this.ps.points[1]);
 
         //completes the lower section of the convex hull
         for(let i=2;i<this.ps.size();i++){
@@ -360,6 +382,7 @@ function ConvexHull (ps, viewer) {
                 stack.push(c);
 
                 steps.push(c);
+                //console.log("this.steps");
             }
             else{
                 //defines variables a and b as the top 2 elements of the stack
@@ -368,7 +391,9 @@ function ConvexHull (ps, viewer) {
                 
                 //while the stack is more than one element and angle abc is not a right turn, pop the top element off the stack and update a,b accordingly
                 while((stack.length>1)&&(orientation(a,b,c)!=1)){
-                    steps.push(stack.pop());
+                    var remove2 = stack.pop();
+                    steps.push(remove2);
+                    console.log("push to steps when popping from array ",remove2);
                     //adds the popped stack element to steps 
                     var a = stack[stack.length-2];
                     var b = stack[stack.length-1]; 
@@ -378,6 +403,7 @@ function ConvexHull (ps, viewer) {
 
                 //adds to steps
                 steps.push(c);
+                console.log("final push of c ",c);
             }
         }
         //initializes a new PointSet and copies the stack elements into it
@@ -386,6 +412,8 @@ function ConvexHull (ps, viewer) {
             PS.addNewPoint(stack[a].x,stack[a].y);
         }
         this.ps.reverse();
+        console.log(stack);
+        console.log(this.steps);
         //once both the upper and lower hulls have been completed and stored in the stack, returns the stack
         return PS;
     }
