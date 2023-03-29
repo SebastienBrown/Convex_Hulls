@@ -218,25 +218,30 @@ function ConvexHull (ps, viewer) {
     }
 
     this.animate = function () {
-	
-        //makes an edge between two leftmost points, and erases it otherwise.
-        if(viewer.edgesCount >= 1){
-            (viewer.edges.pop()).classList.remove("edge");
-            viewer.edgesCount--;
-        }else{
-        
-        var edgeElt = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        edgeElt.setAttributeNS(null, "x1", ps.points[0].x);
-	    edgeElt.setAttributeNS(null, "y1", ps.points[0].y);
-	    edgeElt.setAttributeNS(null, "x2", ps.points[1].x);
-	    edgeElt.setAttributeNS(null, "y2", ps.points[1].y);
-	    edgeElt.classList.add("edge");
-        viewer.edges.push(edgeElt);
-        svg.appendChild(edgeElt);
-        viewer.edgesCount++;
+        this.getConvexHull();
+        this.stepCount = 1;
+        if (this.curAnimation == null) {
+            this.curAnimation = setInterval(() => {
+            this.animateStep();
+            }, 1000);
         }
-
-    }
+        }
+    
+    this.animateStep = function () {
+        if (this.stepCount < this.steps.length) {
+            console.log("taking a step");
+            this.step();
+        } else {
+            this.stopAnimation();
+        }
+        }
+    
+    this.stopAnimation = function () {
+        clearInterval(this.curAnimation);
+        this.curAnimation = null;
+        console.log("animation completed");
+        }
+    
 
     this.getConvexHull = function () {
         
